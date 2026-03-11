@@ -1,14 +1,14 @@
 const UserModel = require('../model/UserModel');
 const OrderModel = require('../model/OrderModel');
 
-const ADMIN_USERNAME = "admin";
+const ADMIN_EMAIL = "admin@baghaven.com";
 const ADMIN_PASSWORD = "admin123";
 
 exports.adminLogin = (req, res) => {
 
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
 
         req.session.isAdmin = true;
 
