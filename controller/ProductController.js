@@ -29,68 +29,120 @@ const upload = multer({
 
 /* ========= ADD PRODUCT ========= */
 
+// exports.addProduct = [
+//     upload.array('images', 3),
+//     async (req, res) => {
+//          if (!req.session.isAdmin) {
+//             return res.status(403).json({
+//                 message: "Only admin can add product"
+//             });
+//         }
+//         try {
+//             const { name, price, rating, category, color } = req.body;
+
+//             if (!name || !price || !rating || !category || !color || !req.files || req.files.length == 0) {
+//                 return res.status(400).json({
+//                     message: "All fields including 3 images are required"
+//                 });
+//             }
+
+//             const imageNames = req.files.map(file => file.filename);
+//             const newProduct = new Product({
+//                 name,
+//                 images: imageNames,
+//                 price,
+//                 rating,
+//                 category,
+//                 color
+//             });
+
+//             await newProduct.save();
+
+//             res.status(201).json({
+//                 message: "Product added successfully",
+//                 data: newProduct
+//             });
+
+//         } catch (error) {
+//             res.status(500).json({
+//                 message: "Error creating product",
+//                 error: error.message
+//             });
+//         }
+//     }
+// ];
+
+// exports.getAllProducts = async (req, res) => {
+//     try {
+//         const products = await Product.find();
+
+//         res.status(200).json({
+//             success: true,
+
+
+//             count: products.length,
+//             data: products
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Error fetching products",
+//             error: error.message
+//         });
+//     }
+// };
+
 exports.addProduct = [
     upload.array('images', 3),
+
     async (req, res) => {
-         if (!req.session.isAdmin) {
+
+        if (!req.session.isAdmin) {
             return res.status(403).json({
                 message: "Only admin can add product"
             });
         }
-        try {
-            const { name, price, rating, category, color } = req.body;
 
-            if (!name || !price || !rating || !category || !color || !req.files || req.files.length == 0) {
+        try {
+
+            const { name, price, rating, category, color, stock, status } = req.body;
+
+            if (!name || !price || !rating || !category || !color || !stock || !status || !req.files || req.files.length !== 3) {
                 return res.status(400).json({
-                    message: "All fields including 3 images are required"
+                    message: "All fields including stock, status and 3 images are required"
                 });
             }
 
             const imageNames = req.files.map(file => file.filename);
+
             const newProduct = new Product({
                 name,
                 images: imageNames,
-                price,
-                rating,
+                price: Number(price),
+                rating: Number(rating),
                 category,
-                color
+                color,
+                stock: Number(stock),
+                status
             });
 
             await newProduct.save();
 
             res.status(201).json({
+                success: true,
                 message: "Product added successfully",
                 data: newProduct
             });
 
         } catch (error) {
+
             res.status(500).json({
                 message: "Error creating product",
                 error: error.message
             });
+
         }
     }
 ];
-
-exports.getAllProducts = async (req, res) => {
-    try {
-        const products = await Product.find();
-
-        res.status(200).json({
-            success: true,
-
-
-            count: products.length,
-            data: products
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Error fetching products",
-            error: error.message
-        });
-    }
-};
-
 /* ========= GET PRODUCT BY ID ========= */
 
 exports.getProductById = async (req, res) => {

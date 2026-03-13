@@ -27,7 +27,7 @@ exports.Register = async (req, res) => {
             password: hashedPassword
         });
 
-        res.status(201).json({
+        res.status(201).json({ 
             status: "User Created Successfully",
             data
         });
