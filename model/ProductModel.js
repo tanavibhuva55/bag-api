@@ -24,6 +24,15 @@ const ProductModel = new mongoose.Schema({
     color:{                
         type:String,
         required:true
+    },
+    stock:{
+        type:Number,
+        required:true
+    },
+    status:{
+        type:String,
+        enum:["In Stock","Out of Stock"],
+        default:"In Stock"
     }
 })
 module.exports = mongoose.model("product",ProductModel);

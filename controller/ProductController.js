@@ -72,24 +72,24 @@ const upload = multer({
 //     }
 // ];
 
-// exports.getAllProducts = async (req, res) => {
-//     try {
-//         const products = await Product.find();
+exports.getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find();
 
-//         res.status(200).json({
-//             success: true,
+        res.status(200).json({
+            success: true,
 
 
-//             count: products.length,
-//             data: products
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             message: "Error fetching products",
-//             error: error.message
-//         });
-//     }
-// };
+            count: products.length,
+            data: products
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching products",
+            error: error.message
+        });
+    }
+};
 
 exports.addProduct = [
     upload.array('images', 3),
