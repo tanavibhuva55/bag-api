@@ -11,15 +11,18 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// --- FIXED CORS SETTINGS ---
+// 1. Trust Proxy (Render ke liye zaroori)
+app.set('trust proxy', 1); 
+
+// 2. CORS Settings
 app.use(cors({
-    origin: ["http://localhost:3000"], // Apne frontend ka URL yahan dalein
-    credentials: true, // Ye cookies/session allow karne ke liye zaroori hai
+    origin: ["http://localhost:3000", "https://your-frontend-link.vercel.app"], 
+    credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -30,28 +33,28 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static('uploads'));
 
-// --- FIXED SESSION SETTINGS ---
+// 3. FIXED SESSION SETTINGS (Only Use This One)
 app.use(session({
     secret: 'ecommerce-secret',
     resave: false,
-    saveUninitialized: false, // Isko false rakhein taaki faltu sessions create na hon
+    saveUninitialized: false,
     cookie: {
-        secure: false, // Localhost pe false rakhein, agar Render pe deploy hai aur HTTPS hai toh true karein
+        secure: true,      // Render pe HTTPS hai isliye TRUE
+        sameSite: 'none',  // Cross-origin ke liye NONE
         httpOnly: true,
-        sameSite: 'lax', // Local development ke liye 'lax' sahi hai
-        maxAge: 1000 * 60 * 60 * 24 // 24 ghante
+        maxAge: 1000 * 60 * 60 * 24 
     }
 }));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-// catch 404 and forward to error handler
+// Catch 404
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
