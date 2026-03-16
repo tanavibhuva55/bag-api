@@ -15,7 +15,8 @@ const ProductModel = new mongoose.Schema({
     },
     rating:{
         type:Number,
-        required:true
+        required:false,
+        default:5
     },
     category:{
         type:String,
