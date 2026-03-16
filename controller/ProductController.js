@@ -161,6 +161,43 @@ exports.getProductById = async (req, res) => {
 };
 
 /* ========= UPDATE PRODUCT ========= */
+// exports.updateProduct = [
+//     upload.array('images', 3),
+//     async (req, res) => {
+//          if (!req.session.isAdmin) {
+//             return res.status(403).json({
+//                 message: "Only admin can update product"
+//             });
+//         }
+//         try {
+//             const { id } = req.params;
+//             const updates = { ...req.body };
+
+//             if (req.files && req.files.length > 0) {
+//                 updates.images = req.files.map(file => file.filename);
+//             }
+
+//             const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true });
+
+//             if (!updatedProduct) {
+//                 return res.status(404).json({
+//                     message: "Product not found"
+//                 });
+//             }
+
+//             res.status(200).json({
+//                 message: "Product updated successfully",
+//                 data: updatedProduct
+//             });
+
+//         } catch (error) {
+//             res.status(500).json({
+//                 message: "Error updating product",
+//                 error: error.message
+//             });
+//         }
+//     }
+// ];
 
 // /* ========= UPDATE PRODUCT (Corrected) ========= */
 exports.updateProduct = [
