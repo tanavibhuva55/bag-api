@@ -37,30 +37,24 @@ exports.Register = async (req, res) => {
 };
 
 /* --- LOGIN (Sends OTP) --- */
+  /* --- LOGIN (Sends OTP) --- */
 exports.Login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await UserModel.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ status: "User not registered" });
+        if (!user) return res.status(404).json({ status: "User not registered" });
+
+        if (password) {
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return res.status(401).json({ status: "Check your email and password" });
+        } else if (!req.session.otpData) {
+            return res.status(400).json({ status: "Session expired, login again" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ status: "Check your email and password" });
-        }
-
-        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        // Store in SESSION (Not in node-persist)
-        req.session.otpData = { 
-            userId: user._id, 
-            otp: otp, 
-            email: email,
-            type: 'login' 
-        };
+        req.session.otpData = { userId: user._id, otp: otp, email: email };
 
         let mailOptions = {
             from: 'jankisutariya14@gmail.com',
@@ -70,8 +64,11 @@ exports.Login = async (req, res) => {
         };
 
         transporter.sendMail(mailOptions, (error) => {
-            if (error) return res.status(500).json({ status: "Mail failed", error });
-            res.status(200).json({ status: "Login Success. OTP sent to your email" });
+            if (error) {
+                console.log("MAIL ERROR:", error); // Logs check karein Render pe
+                return res.status(500).json({ status: "Mail failed", error: error.message });
+            }
+            res.status(200).json({ status: "OTP sent to your email" });
         });
 
     } catch (error) {
@@ -82,25 +79,16 @@ exports.Login = async (req, res) => {
 /* --- VERIFY OTP --- */
 exports.VerifyOTP = async (req, res) => {
     const sessionData = req.session.otpData;
-
-    if (!sessionData || sessionData.type !== 'login') {
-        return res.status(400).json({ status: "No OTP request found" });
-    }
+    if (!sessionData) return res.status(400).json({ status: "No OTP request found" });
 
     if (parseInt(req.body.otp) === sessionData.otp) {
-        const userId = sessionData.userId;
-        req.session.userId = userId; // User logged in
-        req.session.otpData = null; // Clear OTP data
-
-        res.status(200).json({
-            status: "OTP verified successfully",
-            userId: userId
-        });
+        req.session.userId = sessionData.userId;
+        req.session.otpData = null; 
+        res.status(200).json({ status: "OTP verified successfully", userId: sessionData.userId });
     } else {
         res.status(400).json({ status: "Invalid OTP" });
     }
 };
-
 /* --- FORGET PASSWORD --- */
 exports.ForgetPassword = async (req, res) => {
     const user = await UserModel.findOne({ email: req.body.email });

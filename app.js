@@ -1,17 +1,17 @@
-var cors = require('cors');
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const session = require('express-session');
+var createError = require('http-errors');
+const cors = require('cors'); // Sirf ek baar declare karein
+const session = require('express-session'); // Sirf ek baar declare karein
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
 
-// 1. Trust Proxy (Render ke liye zaroori)
+// 1. Trust Proxy (Render aur production HTTPS ke liye zaroori)
 app.set('trust proxy', 1); 
 
 // 2. CORS Settings
@@ -33,19 +33,20 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static('uploads'));
 
-// 3. FIXED SESSION SETTINGS (Only Use This One)
+// 3. FIXED SESSION SETTINGS
 app.use(session({
     secret: 'ecommerce-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,      // Render pe HTTPS hai isliye TRUE
-        sameSite: 'none',  // Cross-origin ke liye NONE
+        secure: true,      // Production (HTTPS) pe TRUE hona chahiye
+        sameSite: 'none',  // Cross-origin frontend-backend ke liye
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 
     }
 }));
 
+// Routes (Hamesha session ke baad aane chahiye)
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
