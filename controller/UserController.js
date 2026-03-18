@@ -2,15 +2,13 @@ const UserModel = require('../model/UserModel');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
-// ✅ TRANSPORTER (PRODUCTION READY)
-let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS
-    }
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",   // 🔥 host हटाओ
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS
+  }
 });
 
 // ✅ CHECK CONNECTION (IMPORTANT)
